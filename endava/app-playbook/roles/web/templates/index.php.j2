@@ -1,0 +1,12 @@
+<?php
+
+$connection1 = new PDO('mysql:host={{ hostvars[groups['dbservers'][0]].ansible_eth0.ipv4.address }};dbname=demo', 'demo', 'demo');
+$statement1  = $connection1->query('SELECT message FROM demo');
+
+$connection2 = new PDO('mysql:host={{ hostvars[groups['dbservers'][1]].ansible_eth0.ipv4.address }};dbname=demo', 'demo', 'demo');
+$statement2  = $connection1->query('SELECT message FROM demo');
+
+echo $statement1->fetchColumn();
+echo $statement2->fetchColumn();
+
+?>

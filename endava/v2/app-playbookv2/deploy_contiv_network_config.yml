@@ -1,0 +1,17 @@
+- name: Gather facts on all hosts
+  hosts: 
+    - master
+    - worker
+  remote_user: "{{ ansible_remote_user }}"
+  gather_facts: True
+  become: yes
+  become_method: sudo
+
+- name: Configure networks
+  hosts: master
+  remote_user: "{{ ansible_remote_user }}"
+  become: yes
+  become_method: sudo
+  roles:
+    - contiv_network_cfg
+    

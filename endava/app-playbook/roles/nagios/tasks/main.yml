@@ -1,0 +1,66 @@
+- name: install nagios 
+  apt: pkg={{ item }} state=present
+  with_items:
+   - nagios3
+   - nagios-plugins
+   - nagios-nrpe-plugin
+   - nagios-plugins-common
+   - nagios-plugins-contrib
+  notify: restart apache
+
+- name: create nagios config dir
+  file: path=/etc/nagios3/ansible-managed state=directory
+
+- name: create nagios3 hosts directory
+  file:
+    path: /var/log/nagios3/spool/checkresults 
+    state: directory
+    owner: nagios
+    group: nagios
+
+- name: create nagios3 cmd directory
+  file:
+    path: /var/spool/nagios3/cmd
+    state: directory
+    owner: nagios
+    group: nagios
+
+- name: configure nagios
+  copy: src=nagios.cfg dest=/etc/nagios3/nagios.cfg
+  notify: restart nagios
+
+- name: configure localhost monitoring
+  copy: src=localhost.cfg dest=/etc/nagios3/localhost.cfg
+  notify: restart nagios
+
+- name: configure commands for monitoring
+  copy: src=commands.cfg dest=/etc/nagios3/commands.cfg
+  notify: restart nagios
+
+- name: configure nagios access
+  copy: src=htpasswd.users dest=/etc/nagios3/htpasswd.users
+  notify: restart nagios
+
+- name: configure nagios services
+  copy: src=ansible-managed-services.cfg dest=/etc/nagios3/
+
+- name: create the nagios object files
+  template: src={{ item + ".j2" }}
+            dest=/etc/nagios3/ansible-managed/{{ item }}
+  with_items:
+    - webservers.cfg
+    - dbservers.cfg
+    - lbservers.cfg
+  notify: restart nagios
+
+- name: start nagios
+  service: name=nagios3 state=started enabled=yes
+
+- name: Link Apache configuration
+  file:
+    src: /etc/nagios3/apache2.conf
+    dest: /etc/apache2/sites-enabled/nagios.conf
+    owner: root
+    group: root
+    state: link
+

@@ -1,0 +1,17 @@
+- name: Install php and git 
+  apt: name={{ item }} state=present
+  with_items:
+   - php
+   - php-mysql
+   - libapache2-mod-php
+   - git
+
+- name: Delete index.html
+  file:
+    path: /var/www/html/index.html
+    state: absent
+
+- name: Copy index php file 
+  template: src=index.php.j2 dest=/var/www/html/index.php
+  notify: restart apache
+

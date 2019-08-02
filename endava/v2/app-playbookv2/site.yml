@@ -1,0 +1,34 @@
+- name: Bootstrap Tasks
+  hosts: 
+    - master
+    - worker
+  remote_user: "{{ ansible_remote_user }}"
+  gather_facts: False
+  roles:
+    - common
+
+- name: Install Kubernetes master
+  hosts: master
+  remote_user: "{{ ansible_remote_user }}"
+  become: yes
+  become_method: sudo
+  roles:
+    - docker
+    - kubeadm
+    - master
+    - contiv
+
+- name: Install nodes
+  remote_user: "{{ ansible_remote_user }}"
+  hosts: worker
+  become: yes
+  become_method: sudo
+  roles:
+    - docker
+    - kubeadm
+    - worker
+
+- import_playbook: deploy_contiv_network_config.yml
+- import_playbook: deploy_istio.yml
+- import_playbook: deploy_apps.yml
+

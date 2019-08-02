@@ -1,0 +1,5 @@
+mode: http
+listenport: 80
+daemonname: myapplb
+balance: roundrobin 
+iface: '{{ ansible_default_ipv4.interface }}'

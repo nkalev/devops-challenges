@@ -1,0 +1,5 @@
+mysqlservice: mysql
+mysql_port: 3306
+dbuser: demo
+dbname: demo
+upassword: demo

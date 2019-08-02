@@ -1,0 +1,16 @@
+
+[master]
+master1 ansible_ssh_host=x.x.x.x
+
+[worker]
+a.a.a.a
+b.b.b.b
+c.c.c.c
+d.d.d.d
+
+[master:vars]
+ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+
+[worker:vars]
+ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+

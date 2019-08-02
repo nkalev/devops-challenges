@@ -1,0 +1,53 @@
+- hosts: 
+  - monitoring
+  - dbservers
+  - webservers
+  - lbservers
+  remote_user: "{{ ansible_remote_user }}"
+  become: yes
+  become_method: sudo
+  gather_facts: False
+  pre_tasks:
+    - raw: sudo apt-get -y install python-minimal
+
+- hosts: 
+  - monitoring
+  - dbservers
+  - webservers
+  - lbservers
+  remote_user: "{{ ansible_remote_user }}"
+  become: yes
+  become_method: sudo
+  gather_facts: True
+  roles:
+  - common
+
+- hosts: dbservers
+  remote_user: "{{ ansible_remote_user }}"
+  become: yes
+  become_method: sudo
+  roles:
+  - db
+
+- hosts: webservers
+  remote_user: "{{ ansible_remote_user }}" 
+  become: yes
+  become_method: sudo
+  roles:
+  - base-apache
+  - web
+
+- hosts: lbservers
+  remote_user: "{{ ansible_remote_user }}"
+  become: yes
+  become_method: sudo
+  roles:
+  - haproxy
+
+- hosts: monitoring
+  remote_user: "{{ ansible_remote_user }}"
+  become: yes
+  become_method: sudo
+  roles:
+  - base-apache
+  - nagios

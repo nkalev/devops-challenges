@@ -1,0 +1,27 @@
+[webservers]
+x.x.x.x
+y.y.y.y
+
+[dbservers]
+z.z.z.z
+d.d.d.d
+
+[lbservers]
+a.a.a.a
+b.b.b.b
+
+[monitoring]
+nagios ansible_ssh_host=c.c.c.c
+
+[webservers:vars]
+ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+
+[dbservers:vars]
+ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+
+[lbservers:vars]
+ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+
+[monitoring:vars]
+ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+

@@ -1,0 +1,43 @@
+- name: Install and Update Python
+  raw: sudo bash -c "test -e /usr/bin/python || (apt -qqy update && apt install -qy python-minimal)"
+
+- name: Run the equivalent of "apt-get update" as a separate step
+  apt:
+    update_cache: yes
+  become: yes
+  become_method: sudo
+
+- name: Update all packages to the latest version
+  apt:
+    upgrade: dist
+  become: yes
+  become_method: sudo
+
+- name: install basic packages
+  apt: package={{ item }}  update_cache=yes
+  with_items:
+    - jq
+    - tree
+    - python-yaml
+  become: yes
+  become_method: sudo
+
+- name: install some useful nagios plugins 
+  apt: name={{ item }} state=present
+  with_items:
+   - nagios-nrpe-plugin
+   - monitoring-plugins
+
+- name: Install chrony
+  apt: name=chrony state=present
+  tags: chrony
+
+- name: Configure chrony file
+  template: src=chrony.conf.j2 dest=/etc/chrony/chrony.conf
+  tags: chrony
+  notify: restart chrony
+
+- name: Start the chrony service
+  service: name=chrony state=started enabled=yes
+  tags: chrony
+

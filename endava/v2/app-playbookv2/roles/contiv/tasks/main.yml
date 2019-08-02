@@ -1,0 +1,39 @@
+- name: Copy files from contiv/netplugin on github
+  get_url:
+    url: "{{ item }}"
+    dest: /tmp/
+    mode: 0755
+  with_items:
+      - https://raw.githubusercontent.com/contiv/netplugin/master/install/k8s/contiv/contiv-compose
+      - https://raw.githubusercontent.com/contiv/netplugin/master/install/k8s/contiv/contiv-base.yaml
+
+- name: Contiv Compose
+  shell: /tmp/contiv-compose use-release --k8s-api https://{{ master_ip }}:6443 /tmp/contiv-base.yaml > /tmp/contiv.yaml
+ 
+- name: Install Contiv Networking
+  command: "kubectl --kubeconfig /etc/kubernetes/admin.conf apply -f /tmp/contiv.yaml"
+ 
+- name: Remove kube-dns
+  command: kubectl --kubeconfig /etc/kubernetes/admin.conf {{ item }}
+  with_items:
+    - delete deployment/kube-dns -n kube-system
+    - delete svc kube-dns -n kube-system
+    - delete serviceaccounts kube-dns -n kube-system
+    - delete clusterrolebindings system:kube-dns -n kube-system
+  ignore_errors: yes
+  when: delete_kube_dns
+
+- name: wait for netmaster to become active.
+  wait_for:
+    port: 9999
+    delay: 10
+    timeout: 900
+      
+- name: Ensure there is a netmaster entry in /etc/hosts for this machine. Otherwise netctl doesn't work.  
+  lineinfile:
+    dest: /etc/hosts
+    line: "{{ master_ip }} netmaster"
+ 
+- pause:
+    minutes: 2
+    prompt: "Make sure network pods are started"

@@ -1,0 +1,6 @@
+
+master_ip: "{{ hostvars['nagios']['ansible_eth0']['ipv4']['address'] }}"
+
+ansible_remote_user: ubuntu
+
+httpd_port: 80
