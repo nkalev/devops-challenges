@@ -14,6 +14,5 @@ ENV APPPATH /opt/containers
 COPY . $APPPATH
 WORKDIR $APPPATH/app
 RUN pip install -r requirements.txt
-EXPOSE 5000
 ENTRYPOINT ["python"]
 CMD ["hello.py"]
